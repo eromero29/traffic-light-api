@@ -78,6 +78,45 @@ $ mau deploy
 
 With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 
+
+# Usamos una imagen base de Node.js
+FROM node:16-alpine
+
+# Definimos el directorio de trabajo
+WORKDIR /app
+
+# Copiamos el archivo package.json y package-lock.json
+COPY package*.json ./
+
+# Instalamos las dependencias del proyecto
+RUN npm install --production
+
+# Instalamos NestJS CLI de forma global para poder ejecutar el comando 'nest build'
+RUN npm install -g @nestjs/cli
+
+# Copiamos el resto de los archivos de la aplicación
+COPY . .
+
+# Construimos la aplicación
+RUN npm run build
+
+# Exponemos el puerto 3000 para el contenedor
+EXPOSE 3000
+
+# Ejecutamos el comando para iniciar la aplicación
+CMD ["npm", "run", "start:prod"]
+
+
+# .dockerignore
+node_modules
+dist
+*.log
+
+# Construimos la imagen
+docker build -t traffic-light-api .
+
+# ejecutamos la imagen
+docker run -p 3000:3000 traffic-light-api
 ## Resources
 
 Check out a few resources that may come in handy when working with NestJS:
